@@ -1,8 +1,8 @@
 {
-  "name": "@food_diary/auth",
-  "version": "0.2.7",
+  "name": "@jurusankuliah/auth",
+  "version": "0.1.1",
   "description": "Auth Service",
-  "author": "Adi Zulfikar, Aditia Prasetio",
+  "author": "Aditia Prasetio",
   "license": "MIT",
   "scripts": {
     "format": "prettier --write \"src/**/*.ts\"",

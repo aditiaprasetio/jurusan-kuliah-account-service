@@ -82,8 +82,8 @@ export class AccountService extends TypeOrmCrudService<Account> {
         last_name: 'admin',
         username: 'admin',
         password: encryptPassword('admin'),
-        email: 'admin@nutriteam.com',
-        phone_number: '0812123123121',
+        email: 'admin@literasimimpi.id',
+        phone_number: '085000000000',
         gender: EGender.MALE,
         roles: [ERoles.ADMIN],
       };
@@ -97,28 +97,13 @@ export class AccountService extends TypeOrmCrudService<Account> {
         last_name: 'user',
         username: 'user',
         password: encryptPassword('user'),
-        email: 'user@nutriteam.com',
-        phone_number: '0812123123122',
+        email: 'user@literasimimpi.id',
+        phone_number: '085000000002',
         gender: EGender.FEMALE,
         roles: [ERoles.USER],
       };
 
       bulkData.push(user);
-
-      // nutritionist
-      const nutritionist = {
-        id: 'cddeb72b-d4c0-4504-a480-c769c988946b',
-        first_name: 'nutritionist',
-        last_name: 'nutritionist',
-        username: 'nutritionist',
-        password: encryptPassword('nutritionist'),
-        email: 'nutritionist@nutriteam.com',
-        phone_number: '0812123123123',
-        gender: EGender.MALE,
-        roles: [ERoles.NUTRITIONIST],
-      };
-
-      bulkData.push(nutritionist);
 
       let saved: any;
       bulkData.forEach(async (element: any) => {
@@ -153,21 +138,21 @@ export class AccountService extends TypeOrmCrudService<Account> {
       });
 
       if (oldDto) {
-        if (findAccountByUsername && (dto.username !== oldDto.username)) {
+        if (findAccountByUsername && dto.username !== oldDto.username) {
           return Promise.reject({
             status: 400,
             message: 'Username is already exist',
           });
         }
 
-        if (findAccountByEmail && (dto.email !== oldDto.email)) {
+        if (findAccountByEmail && dto.email !== oldDto.email) {
           return Promise.reject({
             status: 400,
             message: 'Email is already exist',
           });
         }
 
-        if (findAccountByPhone && (dto.phone_number !== oldDto.phone_number)) {
+        if (findAccountByPhone && dto.phone_number !== oldDto.phone_number) {
           return Promise.reject({
             status: 400,
             message: 'Phone number is already exist',

@@ -1,6 +1,5 @@
 export enum ERoles {
   ADMIN = 'ADMIN',
-  NUTRITIONIST = 'NUTRITIONIST',
   USER = 'USER',
 }
 
