@@ -11,7 +11,9 @@ export async function getAccountId(authorization: any) {
   }
 
   const account: any = await jwt.decode(token);
-  return account.id || account.sub;
+  console.info('account', account);
+
+  return account.sub;
 }
 
 export function getCompanyId(headers: any) {

@@ -1,10 +1,10 @@
 import {
   Controller,
   HttpException,
-  UseGuards,
   Post,
-  Body,
+  Request,
   Req,
+  UnauthorizedException,
 } from '@nestjs/common';
 import {
   Crud,
@@ -17,10 +17,7 @@ import {
 import { Account } from './account.entity';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AccountService } from './account.service';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { AuthRegisterDto } from '../auth/auth.dto';
-import { encryptPassword } from '../utils/encrypt';
-import { EGender, ERoles } from './account.enum';
+import { getAccountId } from 'utils/auth';
 
 @Crud({
   model: {
@@ -38,7 +35,7 @@ import { EGender, ERoles } from './account.enum';
 @Controller('account')
 @ApiBearerAuth()
 export class AccountController implements CrudController<Account> {
-  constructor(public service: AccountService) { }
+  constructor(public service: AccountService) {}
 
   get base(): CrudController<Account> {
     return this;
@@ -71,13 +68,33 @@ export class AccountController implements CrudController<Account> {
   }
 
   @Override()
-  async getOne(@ParsedRequest() req: CrudRequest) {
+  async getOne(@ParsedRequest() req: CrudRequest, @Req() request: Request) {
     try {
       const find = req.parsed.paramsFilter.find(
         (item: any) => item.field === 'id',
       );
+
+      console.info('find', find);
+
+      if (!find) {
+        throw new HttpException('Id not found', 400);
+      }
+
       const id = find.value;
-      return await this.service.getOneAccount(id);
+
+      if (id === 'my') {
+        if ((request.headers as any).authorization) {
+          const accountId = await getAccountId(
+            (request.headers as any).authorization,
+          );
+
+          return await this.service.getOneAccount(accountId);
+        } else {
+          throw new UnauthorizedException();
+        }
+      } else {
+        return await this.service.getOneAccount(id);
+      }
     } catch (err) {
       throw new HttpException(err.message || err.response, err.status);
     }
@@ -110,7 +127,7 @@ export class AccountController implements CrudController<Account> {
   }
 
   @Post('/setInitAccount')
-  async setInitAccount(@ParsedRequest() req: CrudRequest) {
+  async setInitAccount() {
     try {
       return this.service.createInitAccount();
     } catch (err) {

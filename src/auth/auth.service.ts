@@ -6,6 +6,7 @@ import {
   AuthRegisterDto,
   GenerateForgotPasswordDto,
   ChangePasswordUsingForgotPasswordTokenDto,
+  AuthLoginViaGoogleDto,
 } from './auth.dto';
 import { JwtService } from '@nestjs/jwt';
 import { encryptPassword, generateRandomString } from '../utils/encrypt';
@@ -16,6 +17,7 @@ import { EFeatureList } from '../services/mail.dto';
 import { EForgotPasswordType } from './auth.enum';
 import { ERoles } from '../account/account.enum';
 import { last } from 'rxjs/operators';
+import { GoogleService } from '../services/google.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +25,7 @@ export class AuthService {
     @InjectRepository(Account) private readonly repo: Repository<Account>,
     private jwtService: JwtService,
     private readonly mailService: MailService,
+    private readonly googleService: GoogleService,
   ) {}
 
   async login(username: string, password: string): Promise<any> {
@@ -110,6 +113,85 @@ export class AuthService {
       } else {
         throw new UnauthorizedException();
       }
+      email = email.trim().toLowerCase();
+
+      console.info('2');
+      let findAccount = await this.repo.findOne({
+        where: {
+          email,
+        },
+      });
+
+      if (!findAccount) {
+        findAccount = await this.repo.findOne({
+          where: {
+            username: email,
+          },
+        });
+      }
+
+      if (!findAccount) {
+        // register
+        const created = await this.repo.create({
+          username: email,
+          email,
+          first_name,
+          last_name,
+          password: encryptPassword(generateRandomString(6)),
+          phone_number,
+          photo_url,
+          roles: [ERoles.USER],
+        });
+        // replace findAccount with new saved account
+        findAccount = await this.repo.save(created);
+      }
+
+      delete findAccount.password;
+      delete findAccount.created_at;
+      delete findAccount.updated_at;
+
+      const payloadAccessToken = {
+        ...findAccount,
+        sub: findAccount.id,
+        typ: 'Bearer',
+      };
+      delete payloadAccessToken.id;
+
+      const payloadRefreshToken = {
+        sub: findAccount.id,
+        typ: 'Refresh',
+      };
+
+      const res: any = {
+        access_token: await this.jwtService.sign(payloadAccessToken),
+        refresh_token: await this.jwtService.sign(payloadRefreshToken),
+      };
+
+      return res;
+    } catch (err) {
+      return Promise.reject(err);
+    }
+  }
+
+  async loginViaGoogle(dto: AuthLoginViaGoogleDto): Promise<any> {
+    try {
+      const checkToken = await this.googleService.checkToken(dto.id_token);
+
+      let email;
+      let first_name;
+      let last_name;
+      let phone_number;
+      let photo_url;
+
+      console.info('11', checkToken);
+      email = checkToken.email;
+      first_name = checkToken.given_name;
+      last_name = checkToken.family_name;
+
+      console.info('1g', email, first_name, last_name);
+      phone_number = null;
+      photo_url = checkToken.picture;
+
       email = email.trim().toLowerCase();
 
       console.info('2');

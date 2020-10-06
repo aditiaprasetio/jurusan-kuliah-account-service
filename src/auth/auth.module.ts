@@ -9,6 +9,7 @@ import { JwtStrategy } from './jwt.strategy';
 import { MailService } from '../services/mail.service';
 
 import dotenv = require('dotenv');
+import { GoogleService } from '../services/google.service';
 
 const { parsed } = dotenv.config({
   path:
@@ -28,7 +29,7 @@ process.env = { ...process.env, ...parsed };
     }),
   ],
 
-  providers: [AuthService, JwtStrategy, MailService],
+  providers: [AuthService, JwtStrategy, MailService, GoogleService],
 
   controllers: [AuthController],
 })

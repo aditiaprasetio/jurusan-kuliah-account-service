@@ -41,12 +41,7 @@ process.env = { ...process.env, ...parsed };
       cli: {
         migrationsDir: __dirname + '/migrations',
       },
-      migrations: [
-        migrations.InitDB1588731975397,
-        migrations.ChangeUsernameEmailPhoneAsUnique1589170223950,
-        migrations.AddColumnPhoto1589438295339,
-        migrations.AddForgotPasswordToken1589900268802,
-      ],
+      migrations: [migrations.InitDB1601900335871],
     }),
     AccountModule,
     AuthModule,

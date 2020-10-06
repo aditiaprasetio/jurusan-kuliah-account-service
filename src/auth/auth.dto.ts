@@ -7,6 +7,11 @@ export class AuthLoginUsingProviderDto {
   provider: string;
 }
 
+export class AuthLoginViaGoogleDto {
+  @ApiModelProperty()
+  id_token: string;
+}
+
 export class AuthLoginDto {
   @ApiModelProperty({ description: 'Username or email or phone number' })
   username: string;

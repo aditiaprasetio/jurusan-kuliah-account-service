@@ -15,6 +15,7 @@ import {
   GenerateForgotPasswordDto,
   ChangePasswordUsingForgotPasswordTokenDto,
   AuthLoginUsingProviderDto,
+  AuthLoginViaGoogleDto,
 } from './auth.dto';
 import { Account } from '../account/account.entity';
 import {
@@ -54,7 +55,19 @@ export class AuthController {
         dataFromProvider,
       };
       console.info('1');
-      return this.service.loginUsingProvider(newDto);
+      return this.service.loginUsingProvider(dto);
+    } catch (err) {
+      throw new HttpException(err.message || err.response, err.status);
+    }
+  }
+
+  @Post('login-via-google')
+  async loginViaGoogle(
+    @Body() dto: AuthLoginViaGoogleDto,
+    @Req() request: Request,
+  ): Promise<any> {
+    try {
+      return this.service.loginViaGoogle(dto);
     } catch (err) {
       throw new HttpException(err.message || err.response, err.status);
     }
