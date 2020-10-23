@@ -17,7 +17,7 @@ import {
 import { Account } from './account.entity';
 import { ApiUseTags, ApiBearerAuth } from '@nestjs/swagger';
 import { AccountService } from './account.service';
-import { getAccountId } from 'utils/auth';
+import { getAccountId } from '../utils/auth';
 
 @Crud({
   model: {
